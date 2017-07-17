@@ -2,9 +2,11 @@
 
 namespace AppBundle\Controller;
 
+use Doctrine\ORM\EntityManager;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
 class DefaultController extends Controller
@@ -20,7 +22,14 @@ class DefaultController extends Controller
 
 
     public function pruebasAction() {
-        echo "Hola mundo";
-        die();
+        /** @var EntityManager $em */
+        $em = $this->getDoctrine()->getManager();
+        $userRepo = $em->getRepository('BackendBundle:User');
+        $users = $userRepo->findAll();
+
+        return $this->json([
+            'status' => 'success',
+            'users' => $users[0]->getName()
+        ]);
     }
 }
