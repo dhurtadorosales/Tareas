@@ -29,11 +29,9 @@ class DefaultController extends Controller
         $users = $userRepo->findAll();
 
         $helpers = $this->get(Helpers::class);
-        echo $helpers->holaMundo();
-        die();
-        return $this->json([
+        return $helpers->json([
             'status' => 'success',
-            'users' => $users[0]->getName()
+            'users' => $users
         ]);
     }
 }
