@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Services\Helpers;
 use Doctrine\ORM\EntityManager;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -27,6 +28,9 @@ class DefaultController extends Controller
         $userRepo = $em->getRepository('BackendBundle:User');
         $users = $userRepo->findAll();
 
+        $helpers = $this->get(Helpers::class);
+        echo $helpers->holaMundo();
+        die();
         return $this->json([
             'status' => 'success',
             'users' => $users[0]->getName()
