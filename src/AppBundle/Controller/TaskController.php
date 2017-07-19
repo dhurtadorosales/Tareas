@@ -100,8 +100,6 @@ class TaskController extends Controller
                             ];
                         }
                     }
-
-
                 }
                 else {
                     $data = [
@@ -146,7 +144,7 @@ class TaskController extends Controller
             //OBTENCIÓN DE LAS TAREAS
             /** @var EntityManager $em */
             $em = $this->getDoctrine()->getManager();
-            $dql = 'SELECT t FROM BackendBundle:Task t ORDER BY t.id DESC';
+            $dql = "SELECT t FROM BackendBundle:Task t WHERE t.user = {$identity->sub} ORDER BY t.id DESC";
             $query = $em->createQuery($dql);
 
             //PAGINACIÓN
