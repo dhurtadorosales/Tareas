@@ -6,6 +6,7 @@ use AppBundle\Services\Helpers;
 use AppBundle\Services\JwtAuth;
 use BackendBundle\Entity\Task;
 use Doctrine\ORM\EntityManager;
+use Monolog\Handler\IFTTTHandler;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
@@ -166,6 +167,192 @@ class TaskController extends Controller
             ];
         }
         else {
+            $data = [
+                'status' => 'error',
+                'code' => 400,
+                'message' => 'Authorization not valid'
+            ];
+        }
+
+        return $helpers->json($data);
+    }
+
+    /**
+     * @Route("/task/detail/{id}", name="task_detail")
+     */
+    public function taskAction(Request $request, $id = null)
+    {
+        $helpers = $this->get(Helpers::class);
+        $jwtAuth = $this->get(JwtAuth::class);
+        $token = $request->get('authorization', null);
+        $authCheck = $jwtAuth->checkToken($token);
+
+        if ($authCheck) {
+            $identity = $jwtAuth->checkToken($token, true);
+
+            //OBTENCIÓN DE LA TAREA
+            /** @var EntityManager $em */
+            $em = $this->getDoctrine()->getManager();
+            $task = $em->getRepository('BackendBundle:Task')->findOneBy([
+                'id' => $id
+            ]);
+
+            if ($task && is_object($task) && $identity->sub == $task->getUser()->getId()) {
+                $data = [
+                    'status' => 'success',
+                    'code' => 200,
+                    'data' => $task
+                ];
+            }
+            else {
+                $data = [
+                    'status' => 'error',
+                    'code' => 404,
+                    'message' => 'Task not found'
+                ];
+            }
+        }
+        else {
+            $data = [
+                'status' => 'error',
+                'code' => 400,
+                'message' => 'Authorization not valid'
+            ];
+        }
+
+        return $helpers->json($data);
+    }
+
+    /**
+     * @Route("/task/search/{search}", name="task_search")
+     */
+    public function searchAction(Request $request, $search = null)
+    {
+        $helpers = $this->get(Helpers::class);
+        $jwtAuth = $this->get(JwtAuth::class);
+        $token = $request->get('authorization', null);
+        $authCheck = $jwtAuth->checkToken($token);
+
+        if ($authCheck) {
+            $identity = $jwtAuth->checkToken($token, true);
+
+            /** @var EntityManager $em */
+            $em = $this->getDoctrine()->getManager();
+
+            //FILTRO
+            $filter = $request->get('filter', null);
+            if (empty($filter)) {
+                $filter = null;
+            }
+            elseif ($filter == 1) {
+                $filter = 'new';
+            }
+            elseif ($filter == 2) {
+                $filter = 'to do';
+            }
+            else {
+                $filter = 'finished';
+            }
+
+            //ORDEN
+            $order = $request->get('order', null);
+            if (empty($order) || $order ==  2) {
+                $order = 'DESC';
+            }
+            else {
+                $order = 'ASC';
+            }
+
+            //BÚSQUEDA
+            if ($search != null) {
+                $dql = "SELECT t FROM BackendBundle:Task t"
+                    . " WHERE t.user = $identity->sub"
+                    . " AND (t.title LIKE :search OR t.description LIKE :search)";
+            }
+            else {
+                $dql = "SELECT t FROM BackendBundle:Task t"
+                    . " WHERE t.user = $identity->sub";
+            }
+
+            //SET FILTER
+            if ($filter != null) {
+                $dql .= " AND t.status = :filter";
+            }
+
+            //SET ORDER
+            $dql .= " ORDER BY t.id $order";
+
+            //CREATE QUERY
+            $query = $em->createQuery($dql)
+                ->setParameter('filter', "$filter");
+
+            //SET PARAMETER FILTER
+            if ($filter != null) {
+                $query->setParameter('filter', "$filter");
+            }
+
+            //SET PARAMETER SEARCH
+            if (!empty($search)) {
+                $query->setParameter('search', "%$search%");
+            }
+
+            $tasks = $query->getResult();
+
+            $data = [
+                'status' => 'success',
+                'code' => 200,
+                'data' => $tasks
+            ];
+        }
+        else {
+            $data = [
+                'status' => 'error',
+                'code' => 400,
+                'message' => 'Authorization not valid'
+            ];
+        }
+
+        return $helpers->json($data);
+    }
+
+    /**
+     * @Route("/task/remove/{id}", name="task_remove")
+     */
+    public function removeAction(Request $request, $id = null)
+    {
+        $helpers = $this->get(Helpers::class);
+        $jwtAuth = $this->get(JwtAuth::class);
+        $token = $request->get('authorization', null);
+        $authCheck = $jwtAuth->checkToken($token);
+
+        if ($authCheck) {
+            $identity = $jwtAuth->checkToken($token, true);
+
+            //OBTENCIÓN DE LA TAREA
+            /** @var EntityManager $em */
+            $em = $this->getDoctrine()->getManager();
+            $task = $em->getRepository('BackendBundle:Task')->findOneBy([
+                'id' => $id
+            ]);
+
+            if ($task && is_object($task) && $identity->sub == $task->getUser()->getId()) {
+                //BORRADO
+                $em->remove($task);
+                $em->flush();
+
+                $data = [
+                    'status' => 'success',
+                    'code' => 200,
+                    'data' => $task
+                ];
+            } else {
+                $data = [
+                    'status' => 'error',
+                    'code' => 404,
+                    'message' => 'Task not found'
+                ];
+            }
+        } else {
             $data = [
                 'status' => 'error',
                 'code' => 400,
