@@ -128,4 +128,51 @@ class TaskController extends Controller
 
         return $helpers->json($data);
     }
+
+    /**
+     * @Route("/task/list", name="task_list")
+     */
+    public function tasksAction(Request $request)
+    {
+        $helpers = $this->get(Helpers::class);
+        $jwtAuth = $this->get(JwtAuth::class);
+        $token = $request->get('authorization', null);
+        $authCheck = $jwtAuth->checkToken($token);
+
+        if ($authCheck) {
+            $identity = $jwtAuth->checkToken($token, true);
+
+            //OBTENCIÓN DE LAS TAREAS
+            /** @var EntityManager $em */
+            $em = $this->getDoctrine()->getManager();
+            $dql = 'SELECT t FROM BackendBundle:Task t ORDER BY t.id DESC';
+            $query = $em->createQuery($dql);
+
+            //PAGINACIÓN
+            $page = $request->query->getInt('page', 1); //La primera pagina
+            $paginator = $this->get('knp_paginator');
+            $itemsPerPage = 10;
+            $pagination = $paginator->paginate($query, $page, $itemsPerPage);
+            $totalItemsCount = $pagination->getTotalItemCount();
+
+            $data = [
+                'status' => 'success',
+                'code' => 200,
+                'totalItemsCount' => $totalItemsCount,
+                'pageActual' => $page,
+                'itemsPerPage' => $itemsPerPage,
+                'totalPages' => ceil($totalItemsCount / $itemsPerPage),
+                'data' => $pagination
+            ];
+        }
+        else {
+            $data = [
+                'status' => 'error',
+                'code' => 400,
+                'message' => 'Authorization not valid'
+            ];
+        }
+
+        return $helpers->json($data);
+    }
 }
