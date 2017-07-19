@@ -14,7 +14,9 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 class DefaultController extends Controller
 {
-
+    /**
+     * @Route("/", name="home")
+     */
     public function indexAction(Request $request)
     {
         // replace this example code with whatever you need
@@ -23,7 +25,9 @@ class DefaultController extends Controller
         ]);
     }
 
-
+    /**
+     * @Route("/pruebas", name="default_pruebas")
+     */
     public function pruebasAction(Request $request) {
         $helpers = $this->get(Helpers::class);
         $jwtAuth = $this->get(JwtAuth::class);
@@ -50,6 +54,9 @@ class DefaultController extends Controller
         return $result;
     }
 
+    /**
+     * @Route("/login", name="default_login")
+     */
     public function loginAction(Request $request) {
         $helpers = $this->get(Helpers::class);
 
