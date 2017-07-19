@@ -5,3 +5,7 @@ app_default:
 app_user:
     resource: "@AppBundle/Resources/Config/Routing/user.yml"
     prefix: /user
+
+app_task:
+    resource: "@AppBundle/Resources/Config/Routing/task.yml"
+    prefix: /task

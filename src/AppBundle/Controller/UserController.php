@@ -41,6 +41,9 @@ class UserController extends Controller
             $validateEmail = $this->get('validator')->validate($email, $emailConstraint);
 
             if ($email != null && count($validateEmail) == 0 && $password != null && $name != null && $surname != null) {
+                //CIFRAR LA CONTRASEÑA
+                $pwd = hash('sha256', $password);
+
                 //NUEVO USUARIO
                 $user = new User();
                 $user
@@ -48,7 +51,8 @@ class UserController extends Controller
                     ->setRole($role)
                     ->setEmail($email)
                     ->setName($name)
-                    ->setSurname($surname);
+                    ->setSurname($surname)
+                    ->setPassword($pwd);
 
                 /** @var EntityManager $em */
                 $em = $this->getDoctrine()->getManager();
@@ -124,6 +128,7 @@ class UserController extends Controller
                 $emailConstraint->message = 'This email is not valid';
                 $validateEmail = $this->get('validator')->validate($email, $emailConstraint);
 
+
                 if ($email != null && count($validateEmail) == 0 && $password != null && $name != null && $surname != null) {
                     $user
                         //->setCreatedAt($createdAt)
@@ -131,6 +136,12 @@ class UserController extends Controller
                         ->setEmail($email)
                         ->setName($name)
                         ->setSurname($surname);
+
+                    //CIFRAR LA CONTRASEÑA
+                    if ($password != null) {
+                        $pwd = hash('sha256', $password);
+                        $user->setPassword($pwd);
+                    }
 
                     //COMPROBAMOS SI EXISTE
                     $issetUser = $em->getRepository('BackendBundle:User')->findBy([

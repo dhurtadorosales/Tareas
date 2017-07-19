@@ -81,6 +81,10 @@ class DefaultController extends Controller
             $emailConstraint = new Assert\Email();
             $emailConstraint->message = 'This email is not valid';
             $validateEmail = $this->get('validator')->validate($email, $emailConstraint);
+
+            //CIFRAR LA CONTRASEÑA
+            $pwd = hash('sha256', $password);
+
             /** @var EntityManager $em */
             $em = $this->getDoctrine()->getManager();
             if ($email != null && count($validateEmail) == 0 && $password != null) {
@@ -89,11 +93,11 @@ class DefaultController extends Controller
 
                 if ($getToken == null || $getToken == false) {
                     //DATOS CODIFICADOS
-                    $signUp = $jwtAuth->signUp($email, $password);
+                    $signUp = $jwtAuth->signUp($email, $pwd);
                 }
                 else {
                     //DATOS DECODIFICADOS
-                    $signUp = $jwtAuth->signUp($email, $password, true);
+                    $signUp = $jwtAuth->signUp($email, $pwd, true);
                 }
 
                 return $this->json($signUp);
