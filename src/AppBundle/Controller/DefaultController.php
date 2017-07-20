@@ -22,7 +22,7 @@ class DefaultController extends Controller
         ]);
     }
 
-    public function pruebasAction(Request $request) {
+    public function pruebaasAction(Request $request) {
         $helpers = $this->get(Helpers::class);
         $jwtAuth = $this->get(JwtAuth::class);
         $token = $request->get('authorization', null);
