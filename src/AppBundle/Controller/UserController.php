@@ -13,9 +13,6 @@ use BackendBundle\Entity\User;
 
 class UserController extends Controller
 {
-    /**
-     * @Route("/user/new", name="user_new")
-     */
     public function newAction(Request $request)
     {
         $helpers = $this->get(Helpers::class);
@@ -85,9 +82,6 @@ class UserController extends Controller
         return $helpers->json($data);
     }
 
-    /**
-     * @Route("/user/edit", name="user_edit")
-     */
     public function editAction(Request $request)
     {
         $helpers = $this->get(Helpers::class);

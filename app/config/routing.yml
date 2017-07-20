@@ -1,6 +1,14 @@
-#app:
-#    resource: '@AppBundle/Resources/Config/Routing/default.yml'
-#    prefix: /
 app:
-    resource: "@AppBundle/Controller/"
-    type:     annotation
+    resource: '@AppBundle/Resources/Config/Routing/default.yml'
+    prefix: /
+#app:
+#    resource: "@AppBundle/Controller/"
+#    type:     annotation
+
+app_user:
+    resource: "@AppBundle/Resources/Config/Routing/user.yml"
+    prefix: /user
+
+app_task:
+    resource: "@AppBundle/Resources/Config/Routing/task.yml"
+    prefix: /task

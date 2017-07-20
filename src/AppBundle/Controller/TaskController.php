@@ -13,10 +13,6 @@ use Symfony\Component\HttpFoundation\Request;
 
 class TaskController extends Controller
 {
-    /**
-     * @Route("/task/new", name="task_new")
-     * @Route("/task/edit/{id}", name="task_edit")
-     */
     public function newAction(Request $request, $id = null)
     {
         $helpers = $this->get(Helpers::class);
@@ -128,9 +124,6 @@ class TaskController extends Controller
         return $helpers->json($data);
     }
 
-    /**
-     * @Route("/task/list", name="task_list")
-     */
     public function tasksAction(Request $request)
     {
         $helpers = $this->get(Helpers::class);
@@ -175,9 +168,6 @@ class TaskController extends Controller
         return $helpers->json($data);
     }
 
-    /**
-     * @Route("/task/detail/{id}", name="task_detail")
-     */
     public function taskAction(Request $request, $id = null)
     {
         $helpers = $this->get(Helpers::class);
@@ -221,9 +211,6 @@ class TaskController extends Controller
         return $helpers->json($data);
     }
 
-    /**
-     * @Route("/task/search/{search}", name="task_search")
-     */
     public function searchAction(Request $request, $search = null)
     {
         $helpers = $this->get(Helpers::class);
@@ -313,9 +300,6 @@ class TaskController extends Controller
         return $helpers->json($data);
     }
 
-    /**
-     * @Route("/task/remove/{id}", name="task_remove")
-     */
     public function removeAction(Request $request, $id = null)
     {
         $helpers = $this->get(Helpers::class);
